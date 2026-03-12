@@ -15,7 +15,7 @@ const checkOverload = () => {
 
     const maxConnection = numCores * 5;
     console.log(`Number of Connection: ${numConnection}`);
-    console.log(`Memory Usage: ${memoryUsage / 1024 / 1024}MB`);
+    console.log(`Memory Usage: ${memoryUsage / 1024 / 1024} MB`);
 
     if (numConnection > maxConnection) {
       console.log(`Connection Overloaddd`);
