@@ -2,6 +2,8 @@ const express = require("express");
 const morgan = require("morgan");
 const helmet = require("helmet");
 const compression = require("compression");
+const route = require('./routers')
+
 const { checkOverload } = require("./helper/checkConnection");
 
 const app = express();
@@ -13,10 +15,7 @@ checkOverload();
 
 require("./dbs/init.mongodb");
 
-app.get("/", (req, res) => {
-  return res.status(200).json({
-    message: "his",
-  });
-});
+
+app.use("/", route);
 
 module.exports = app;

@@ -1,9 +1,8 @@
 const mongoose = require("mongoose");
 const { db } = require("../configs/common");
-
 const { countConnection } = require("../helper/checkConnection");
+
 const MONGO_URI = `mongodb://${db.host}:${db.port}/${db.name}`;
-console.log(MONGO_URI)
 class DataBase {
   constructor() {
     this.connect();

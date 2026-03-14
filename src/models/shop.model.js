@@ -11,6 +11,7 @@ const shopSchema = new Schema(
       type: String,
       unique: true,
       trim: true,
+      required: true,
     },
     password: {
       type: String,
