@@ -4,7 +4,9 @@ const bcrypt = require("bcrypt");
 const crypto = require("crypto");
 const KeyTokenService = require("./keyToken.service");
 const { createKeyPair } = require("../auth/authUtils");
+const { getInfoData } = require("../utils");
 
+const GET_DATA = ["_id", "name", "email", "roles"];
 class AccessService {
   constructor() {}
 
@@ -13,10 +15,7 @@ class AccessService {
       const hasEmail = await shopModel.findOne({ email }).lean();
 
       if (hasEmail) {
-        return {
-          code: "xxx",
-          message: "Email has been used, shop already registered",
-        };
+        throw new Error("Email has been used, shop already registered");
       }
       const hashPass = await bcrypt.hash(password, 10);
 
@@ -28,54 +27,51 @@ class AccessService {
       });
 
       if (newShop) {
-        const { publicKey, privateKey } = crypto.generateKeyPairSync("rsa", {
-          modulusLength: 4096,
-          publicKeyEncoding: {
-            type: "pkcs1",
-            format: "pem",
-          },
-          privateKeyEncoding: {
-            type: "pkcs1",
-            format: "pem",
-          },
-        });
+        // RSA JWT
+        // const { publicKey, privateKey } = crypto.generateKeyPairSync("rsa", {
+        //   modulusLength: 4096,
+        //   publicKeyEncoding: {
+        //     type: "pkcs1",
+        //     format: "pem",
+        //   },
+        //   privateKeyEncoding: {
+        //     type: "pkcs1",
+        //     format: "pem",
+        //   },
+        // });
+
+        const publicKey = crypto.randomBytes(64).toString("hex");
+        const privateKey = crypto.randomBytes(64).toString("hex");
 
         const resToken = await KeyTokenService.createKeyToken({
           userId: newShop._id,
           publicKey,
+          privateKey,
         });
 
         if (!resToken) {
-          return {
-            code: "xxx",
-            message: "Create token failed",
-          };
+          throw new Error("Create token failed");
         }
 
         const res = await createKeyPair(
           { userId: newShop._id, email },
-          resToken,
+          publicKey,
           privateKey,
         );
+
         return {
-          code: 201,
           metaData: {
-            shop: newShop,
+            shop: getInfoData(newShop, GET_DATA),
             tokens: res,
           },
         };
       }
 
       return {
-        code: 200,
         metadata: null,
       };
     } catch (err) {
-      return {
-        code: "xxx",
-        message: err.message,
-        status: "err",
-      };
+      throw err;
     }
   };
 }
