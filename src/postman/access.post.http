@@ -1,8 +1,9 @@
 POST http://localhost:3051/v1/api/shop/signup
 Content-Type: application/json
+x-api-key: 0901ca2ad53ed4a806a00f82d89ef15b08c24239f8c1ee34a85f1148e84b1ce050a8cd9cf5c191f8a1d4baf8db7bddaaa99b3b4582cea21e179b76cc4679bda2
 
 {
-    "name" : "Loc",
-    "email": "112212@gmail.ccc",
-    "password" : "111111"
+    "name" : "Locc2",
+    "email": "1112@gmail.ccc",
+    "password" : "ddddd"
 }
