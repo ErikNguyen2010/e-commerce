@@ -23,20 +23,32 @@ const checkApiKey = async (req, res, next) => {
   } catch (err) {}
 };
 
-
-const checkPermission = (permission) =>{
-  return (req,res,next) =>{
-    if(!req.objKey.permissions || !req.objKey.permissions.includes(permission)){
+const checkPermission = (permission) => {
+  return (req, res, next) => {
+    if (
+      !req.objKey.permissions ||
+      !req.objKey.permissions.includes(permission)
+    ) {
       return res.status(403).json({
         message: "Permission denied",
       });
     }
 
-    return next()
-  }
-}
+    return next();
+  };
+};
+
+const aynscHandler =  (fn) =>{
+  return async (req,res,next) =>{
+    try{
+      await fn(req,res,next)
+    }catch(err){
+      next(err)
+    }
+ }}
 
 module.exports = {
   checkApiKey,
-  checkPermission
+  checkPermission,
+  aynscHandler
 };

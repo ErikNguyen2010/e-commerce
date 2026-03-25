@@ -5,6 +5,7 @@ const crypto = require("crypto");
 const KeyTokenService = require("./keyToken.service");
 const { createKeyPair } = require("../auth/authUtils");
 const { getInfoData } = require("../utils");
+const { ForbiddenRequestError } = require("../core/error.response");
 
 const GET_DATA = ["_id", "name", "email", "roles"];
 class AccessService {
@@ -15,7 +16,7 @@ class AccessService {
       const hasEmail = await shopModel.findOne({ email }).lean();
 
       if (hasEmail) {
-        throw new Error("Email has been used, shop already registered");
+        throw new ForbiddenRequestError('Error: Shop already registered');
       }
       const hashPass = await bcrypt.hash(password, 10);
 

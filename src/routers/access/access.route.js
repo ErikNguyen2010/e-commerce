@@ -1,9 +1,8 @@
-const express = require('express')
-const AccessController = require('../../controllers/access.controller')
-const route = express.Router()
+const express = require("express");
+const AccessController = require("../../controllers/access.controller");
+const { aynscHandler } = require("../../auth/checkAuth");
+const route = express.Router();
 
+route.post("/shop/signup", aynscHandler(AccessController.signUp));
 
-route.post('/shop/signup',  AccessController.signUp)
-
-
-module.exports = route
+module.exports = route;
