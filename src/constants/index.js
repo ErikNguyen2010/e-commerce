@@ -9,11 +9,15 @@ const HEADER = {
 };
 
 const STATUS_CODE = {
+  SUCCESS: 200,
+  CREATED: 201,
   FORBIDDEN: 403,
   CONFLICT: 409,
 };
 
 const STATUS_MESSAGE = {
+  SUCCESS: 'Success',
+  CREATED: 'Created',
   FORBIDDEN: "Bad request error",
   CONFLICT: "Conflict error",
 };

@@ -16,7 +16,7 @@ class AccessService {
       const hasEmail = await shopModel.findOne({ email }).lean();
 
       if (hasEmail) {
-        throw new ForbiddenRequestError('Error: Shop already registered');
+        throw new ForbiddenRequestError("Error: Shop already registered");
       }
       const hashPass = await bcrypt.hash(password, 10);
 
@@ -61,16 +61,12 @@ class AccessService {
         );
 
         return {
-          metaData: {
-            shop: getInfoData(newShop, GET_DATA),
-            tokens: res,
-          },
+          shop: getInfoData(newShop, GET_DATA),
+          tokens: res,
         };
       }
 
-      return {
-        metadata: null,
-      };
+      return null
     } catch (err) {
       throw err;
     }
