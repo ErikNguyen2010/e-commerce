@@ -1,3 +1,4 @@
+const { Types } = require("mongoose");
 const { createKeyPair } = require("../auth/authUtils");
 const keyModel = require("../models/keyToken.model");
 const crypto = require("crypto");
@@ -58,6 +59,14 @@ class KeyTokenService {
     if (!resToken) throw new Error("Create token failed");
 
     return tokens;
+  };
+
+  static findByUserId = async ({ userId }) => {
+    return await keyModel.findOne({ user: new Types.ObjectId(userId) }).lean();
+  };
+
+  static removeKeyTokenModel = async (id) => {
+    return await keyModel.deleteOne(id);
   };
 }
 

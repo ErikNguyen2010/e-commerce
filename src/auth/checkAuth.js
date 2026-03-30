@@ -1,5 +1,8 @@
 const { HEADER } = require("../constants");
+const { AuthFailureError, NotFoundError } = require("../core/error.response");
 const { findById } = require("../services/apiKey.service");
+const KeyTokenService = require("../services/keyToken.service");
+const JWT = require("jsonwebtoken");
 
 const checkApiKey = async (req, res, next) => {
   try {
@@ -38,17 +41,29 @@ const checkPermission = (permission) => {
   };
 };
 
-const aynscHandler =  (fn) =>{
-  return async (req,res,next) =>{
-    try{
-      await fn(req,res,next)
-    }catch(err){
-      next(err)
-    }
- }}
+const handleAuthen = async (req, res, next) => {
+  const clientId = req.headers[HEADER.CLIENT_ID];
+  if (!clientId) throw new AuthFailureError("Invalid Request");
+
+  const keyStore = await KeyTokenService.findByUserId({ userId: clientId });
+  if (!keyStore) throw new NotFoundError("Not found Key Store");
+
+  const accessToken = req.headers[HEADER.AUTHORIZATION];
+  if (!accessToken) throw new AuthFailureError("Invalid Request");
+
+  try {
+    const decodeUser = JWT.verify(accessToken, keyStore.publicKey);
+    if (decodeUser.userId !== clientId)
+      throw new AuthFailureError("Invalid User");
+    req.keyStore = keyStore;
+    return next();
+  } catch (err) {
+    throw err;
+  }
+};
 
 module.exports = {
   checkApiKey,
   checkPermission,
-  aynscHandler
+  handleAuthen,
 };

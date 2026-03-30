@@ -33,9 +33,18 @@ class AuthFailureError extends ErrorResponse {
     super(message, statusCode);
   }
 }
+class NotFoundError extends ErrorResponse {
+  constructor(
+    message = STATUS_MESSAGE.NOT_FOUND,
+    statusCode = STATUS_CODE.NOT_FOUND,
+  ) {
+    super(message, statusCode);
+  }
+}
 
 module.exports = {
   ForbiddenRequestError,
   ConflictRequestError,
   AuthFailureError,
+  NotFoundError,
 };

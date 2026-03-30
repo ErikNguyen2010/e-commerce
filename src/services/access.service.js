@@ -33,6 +33,7 @@ class AccessService {
       throw err;
     }
   };
+
   static signUp = async ({ email, password, name }) => {
     try {
       const hasEmail = await shopModel.findOne({ email }).lean();
@@ -77,6 +78,11 @@ class AccessService {
     } catch (err) {
       throw err;
     }
+  };
+
+  static logout = async (keyStore) => {
+    const delKey = await KeyTokenService.removeKeyTokenModel(keyStore._id);
+    return delKey;
   };
 }
 

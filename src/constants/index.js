@@ -5,6 +5,7 @@ const ROLE = {
 
 const HEADER = {
   API_KEY: "x-api-key",
+  CLIENT_ID: "x-client-id",
   AUTHORIZATION: "authorization",
 };
 
@@ -13,6 +14,7 @@ const STATUS_CODE = {
   CREATED: 201,
   UNAUTHORIZED: 401,
   FORBIDDEN: 403,
+  NOT_FOUND: 404,
   CONFLICT: 409,
 };
 
@@ -22,6 +24,7 @@ const STATUS_MESSAGE = {
   UNAUTHORIZED: "Unauthorized",
   FORBIDDEN: "Bad request error",
   CONFLICT: "Conflict error",
+  NOT_FOUND: "Not found",
 };
 
 module.exports = {
