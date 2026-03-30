@@ -1,16 +1,38 @@
 const { ROLE } = require("../constants");
 const shopModel = require("../models/shop.model");
 const bcrypt = require("bcrypt");
-const crypto = require("crypto");
 const KeyTokenService = require("./keyToken.service");
-const { createKeyPair } = require("../auth/authUtils");
 const { getInfoData } = require("../utils");
-const { ForbiddenRequestError } = require("../core/error.response");
+const {
+  ForbiddenRequestError,
+  AuthFailureError,
+} = require("../core/error.response");
+const { findByEmail } = require("./shop.service");
 
 const GET_DATA = ["_id", "name", "email", "roles"];
 class AccessService {
   constructor() {}
+  static login = async ({ email, password, refreshToken = null }) => {
+    try {
+      const foundShop = await findByEmail(email);
+      if (!foundShop)
+        throw new ForbiddenRequestError("Shop has not been registered");
 
+      const matchPassword = bcrypt.compare(password, foundShop.password);
+      if (!matchPassword) throw new AuthFailureError("Password not match");
+
+      const tokens = await KeyTokenService.createTokens({
+        shop: foundShop,
+      });
+
+      return {
+        shop: getInfoData(foundShop, GET_DATA),
+        tokens,
+      };
+    } catch (err) {
+      throw err;
+    }
+  };
   static signUp = async ({ email, password, name }) => {
     try {
       const hasEmail = await shopModel.findOne({ email }).lean();
@@ -41,32 +63,17 @@ class AccessService {
         //   },
         // });
 
-        const publicKey = crypto.randomBytes(64).toString("hex");
-        const privateKey = crypto.randomBytes(64).toString("hex");
-
-        const resToken = await KeyTokenService.createKeyToken({
-          userId: newShop._id,
-          publicKey,
-          privateKey,
+        const tokens = await KeyTokenService.createTokens({
+          shop: newShop,
         });
-
-        if (!resToken) {
-          throw new Error("Create token failed");
-        }
-
-        const res = await createKeyPair(
-          { userId: newShop._id, email },
-          publicKey,
-          privateKey,
-        );
 
         return {
           shop: getInfoData(newShop, GET_DATA),
-          tokens: res,
+          tokens,
         };
       }
 
-      return null
+      return null;
     } catch (err) {
       throw err;
     }

@@ -34,10 +34,6 @@ class Created extends SuccessResponse {
   }
 }
 
-class Animal{
-  bark = 'gaugau'
-}
-
 module.exports = {
   Success,
   Created,

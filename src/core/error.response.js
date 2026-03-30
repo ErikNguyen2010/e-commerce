@@ -12,7 +12,7 @@ class ConflictRequestError extends ErrorResponse {
     message = STATUS_MESSAGE.CONFLICT,
     statusCode = STATUS_CODE.CONFLICT,
   ) {
-    super(message,statusCode);
+    super(message, statusCode);
   }
 }
 
@@ -21,11 +21,21 @@ class ForbiddenRequestError extends ErrorResponse {
     message = STATUS_MESSAGE.FORBIDDEN,
     statusCode = STATUS_CODE.FORBIDDEN,
   ) {
-    super( message, statusCode);
+    super(message, statusCode);
+  }
+}
+
+class AuthFailureError extends ErrorResponse {
+  constructor(
+    message = STATUS_MESSAGE.UNAUTHORIZED,
+    statusCode = STATUS_CODE.UNAUTHORIZED,
+  ) {
+    super(message, statusCode);
   }
 }
 
 module.exports = {
   ForbiddenRequestError,
   ConflictRequestError,
+  AuthFailureError,
 };

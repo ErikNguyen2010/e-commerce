@@ -11,13 +11,15 @@ const HEADER = {
 const STATUS_CODE = {
   SUCCESS: 200,
   CREATED: 201,
+  UNAUTHORIZED: 401,
   FORBIDDEN: 403,
   CONFLICT: 409,
 };
 
 const STATUS_MESSAGE = {
-  SUCCESS: 'Success',
-  CREATED: 'Created',
+  SUCCESS: "Success",
+  CREATED: "Created",
+  UNAUTHORIZED: "Unauthorized",
   FORBIDDEN: "Bad request error",
   CONFLICT: "Conflict error",
 };

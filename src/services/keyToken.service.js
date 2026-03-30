@@ -1,20 +1,63 @@
+const { createKeyPair } = require("../auth/authUtils");
 const keyModel = require("../models/keyToken.model");
+const crypto = require("crypto");
 
 class KeyTokenService {
   constructor() {}
 
-  static createKeyToken = async ({ userId, publicKey, privateKey }) => {
+  static createKeyTokenModel = async ({
+    userId,
+    refreshToken,
+    publicKey,
+    privateKey,
+  }) => {
     try {
-      const tokenKey = await keyModel.create({
+      const filter = {
         user: userId,
+      };
+
+      const update = {
         publicKey,
         privateKey,
-      });
+        refreshToken,
+        refreshTokensUsed: [],
+      };
 
-      return tokenKey ? tokenKey.publicKey : null;
+      const options = {
+        upsert: true,
+        new: true,
+      };
+
+      const tokens = await keyModel
+        .findOneAndUpdate(filter, update, options)
+        .lean();
+
+      return tokens ? tokens.publicKey : null;
     } catch (err) {
-      return err;
+      throw err;
     }
+  };
+
+  static createTokens = async ({ shop }) => {
+    const publicKey = crypto.randomBytes(64).toString("hex");
+    const privateKey = crypto.randomBytes(64).toString("hex");
+
+    const tokens = await createKeyPair(
+      { userId: shop._id, email: shop.email },
+      publicKey,
+      privateKey,
+    );
+
+    const resToken = await this.createKeyTokenModel({
+      userId: shop._id,
+      refreshToken: tokens.refreshToken,
+      publicKey,
+      privateKey,
+    });
+
+    if (!resToken) throw new Error("Create token failed");
+
+    return tokens;
   };
 }
 
