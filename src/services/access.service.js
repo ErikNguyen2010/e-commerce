@@ -8,10 +8,64 @@ const {
   AuthFailureError,
 } = require("../core/error.response");
 const { findByEmail } = require("./shop.service");
+const JWT = require("jsonwebtoken");
+const { createKeyPair } = require("../auth/authUtils");
 
 const GET_DATA = ["_id", "name", "email", "roles"];
 class AccessService {
   constructor() {}
+
+  static handleRefreshToken = async ({ refreshToken }) => {
+    const foundTokenUsed = await KeyTokenService.findUsedRefreshToken({
+      refreshToken,
+    });
+
+    if (foundTokenUsed) {
+      const { userId } = await JWT.verify(
+        refreshToken,
+        foundTokenUsed.privateKey,
+      );
+
+      await KeyTokenService.deleteKeyByUserId({ userId });
+      throw new ForbiddenRequestError("Something went wrong, please relogin");
+    }
+
+    const foundRefreshToken = await KeyTokenService.findByRefreshToken({
+      refreshToken,
+    });
+
+    if (!foundRefreshToken)
+      throw new AuthFailureError("Shop has not been registered");
+
+    const { userId, email } = await JWT.verify(
+      refreshToken,
+      foundRefreshToken.privateKey,
+    );
+
+    const foundShop = await findByEmail(email);
+    if (!foundShop) throw new AuthFailureError("Shop has not been registered");
+
+    const newTokens = await createKeyPair(
+      { userId, email },
+      foundRefreshToken.publicKey,
+      foundRefreshToken.privateKey,
+    );
+
+    await foundRefreshToken.update({
+      $set: {
+        refreshToken: newTokens.refreshToken,
+      },
+      $addToSet: {
+        refreshTokenUsed: refreshToken,
+      },
+    });
+
+    return {
+      tokens: newTokens,
+      user: { userId, email },
+    };
+  };
+
   static login = async ({ email, password, refreshToken = null }) => {
     try {
       const foundShop = await findByEmail(email);
