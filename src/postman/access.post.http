@@ -1,6 +1,6 @@
 POST http://localhost:3051/v1/api/shop/signup
 Content-Type: application/json
-x-api-key: 8c8d349521c1be6d73d49b687b26a68f2edd2512ad7e4eccadf6020426803766a1f04743bf90b32773ba216438487a263176957c6a32e50abc9adb526b5bb0a3 
+x-api-key: 9c2a005c9e7b40cc573eecf56b6b85b52bdbb99a23b25056437ab81741dca94fa03092af131a7996d737b5e871abcc6facff06d7cb30c9f808e1738c77e7fbae 
 
 {
     "name" : "Locc2",

@@ -80,6 +80,29 @@ class KeyTokenService {
   static findByRefreshToken = async ({ refreshToken }) => {
     return await keyModel.findOne({ refreshToken });
   };
+
+  static updateRefreshToken = async ({
+    userId,
+    refreshToken,
+    refreshTokensUsed,
+  }) => {
+    const filter = {
+      user: new Types.ObjectId(userId),
+    };
+
+    const update = {
+      refreshToken,
+      $addToSet: {
+        refreshTokensUsed,
+      },
+    };
+
+    const options = {
+      new: true,
+    };
+
+    return await keyModel.findOneAndUpdate(filter, update, options);
+  };
 }
 
 module.exports = KeyTokenService;

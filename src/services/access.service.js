@@ -51,13 +51,10 @@ class AccessService {
       foundRefreshToken.privateKey,
     );
 
-    await foundRefreshToken.update({
-      $set: {
-        refreshToken: newTokens.refreshToken,
-      },
-      $addToSet: {
-        refreshTokenUsed: refreshToken,
-      },
+    await KeyTokenService.updateRefreshToken({
+      userId,
+      refreshToken: newTokens.refreshToken,
+      refreshTokensUsed: refreshToken
     });
 
     return {
@@ -72,7 +69,7 @@ class AccessService {
       if (!foundShop)
         throw new ForbiddenRequestError("Shop has not been registered");
 
-      const matchPassword = bcrypt.compare(password, foundShop.password);
+      const matchPassword = await bcrypt.compare(password, foundShop.password);
       if (!matchPassword) throw new AuthFailureError("Password not match");
 
       const tokens = await KeyTokenService.createTokens({

@@ -4,6 +4,14 @@ const AccessService = require("../services/access.service");
 class AccessController {
   constructor() {}
 
+  handleRefreshToken = async (req, res, next) => {
+    const result = await AccessService.handleRefreshToken(req.body);
+    new Success({
+      message: "Refresh token successfully",
+      metadata: result,
+    }).send(res);
+  };
+
   logout = async (req, res, next) => {
     const result = await AccessService.logout(req.keyStore);
     new Success({

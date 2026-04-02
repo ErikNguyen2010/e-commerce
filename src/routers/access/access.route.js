@@ -12,5 +12,6 @@ route.post("/shop/signup", asyncHandler(AccessController.signUp));
 route.use(asyncHandler(handleAuthen));
 
 route.post("/shop/logout", asyncHandler(AccessController.logout));
+route.post("/shop/refresh-token", asyncHandler(AccessController.handleRefreshToken));
 
 module.exports = route;
