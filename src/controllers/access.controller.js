@@ -5,7 +5,11 @@ class AccessController {
   constructor() {}
 
   handleRefreshToken = async (req, res, next) => {
-    const result = await AccessService.handleRefreshToken(req.body);
+    const result = await AccessService.handleRefreshToken({
+      refreshToken: req.refreshToken,
+      keyStore: req.keyStore,
+      user: req.user,
+    });
     new Success({
       message: "Refresh token successfully",
       metadata: result,

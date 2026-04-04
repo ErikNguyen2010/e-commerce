@@ -15,51 +15,35 @@ const GET_DATA = ["_id", "name", "email", "roles"];
 class AccessService {
   constructor() {}
 
-  static handleRefreshToken = async ({ refreshToken }) => {
-    const foundTokenUsed = await KeyTokenService.findUsedRefreshToken({
-      refreshToken,
-    });
+  static handleRefreshToken = async ({ refreshToken, keyStore, user }) => {
+    const { userId, email } = user;
 
-    if (foundTokenUsed) {
-      const { userId } = await JWT.verify(
-        refreshToken,
-        foundTokenUsed.privateKey,
-      );
-
+    if (keyStore.refreshTokensUsed.includes(refreshToken)) {
       await KeyTokenService.deleteKeyByUserId({ userId });
       throw new ForbiddenRequestError("Something went wrong, please relogin");
     }
 
-    const foundRefreshToken = await KeyTokenService.findByRefreshToken({
-      refreshToken,
-    });
-
-    if (!foundRefreshToken)
+    if (keyStore.refreshToken !== refreshToken)
       throw new AuthFailureError("Shop has not been registered");
-
-    const { userId, email } = await JWT.verify(
-      refreshToken,
-      foundRefreshToken.privateKey,
-    );
 
     const foundShop = await findByEmail(email);
     if (!foundShop) throw new AuthFailureError("Shop has not been registered");
 
     const newTokens = await createKeyPair(
       { userId, email },
-      foundRefreshToken.publicKey,
-      foundRefreshToken.privateKey,
+      keyStore.publicKey,
+      keyStore.privateKey,
     );
 
     await KeyTokenService.updateRefreshToken({
       userId,
       refreshToken: newTokens.refreshToken,
-      refreshTokensUsed: refreshToken
+      refreshTokensUsed: refreshToken,
     });
 
     return {
       tokens: newTokens,
-      user: { userId, email },
+      user,
     };
   };
 

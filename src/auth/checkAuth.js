@@ -48,6 +48,21 @@ const handleAuthen = async (req, res, next) => {
   const keyStore = await KeyTokenService.findByUserId({ userId: clientId });
   if (!keyStore) throw new NotFoundError("Not found Key Store");
 
+  if (req.headers[HEADER.REFRESH_TOKEN]) {
+    const refreshToken = req.headers[HEADER.REFRESH_TOKEN];
+    try {
+      const decodeUser = JWT.verify(refreshToken, keyStore.privateKey);
+      if (decodeUser.userId !== clientId)
+        throw new AuthFailureError("Invalid User");
+      req.keyStore = keyStore;
+      req.refreshToken = refreshToken;
+      req.user = decodeUser;
+      return next();
+    } catch (err) {
+      throw err;
+    }
+  }
+
   const accessToken = req.headers[HEADER.AUTHORIZATION];
   if (!accessToken) throw new AuthFailureError("Invalid Request");
 
